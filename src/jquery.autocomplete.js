@@ -85,6 +85,8 @@
                 zIndex: 9999,
                 type: 'GET',
                 noCache: false,
+                onShow: noop,
+                onHide: noop,
                 onSearchStart: noop,
                 onSearchComplete: noop,
                 containerClass: 'autocomplete-suggestions',
@@ -435,6 +437,20 @@
             that.visible = false;
             that.selectedIndex = -1;
             $(that.suggestionsContainer).hide();
+
+            if ($.isFunction(that.options.onHide)) {
+              that.options.onHide.call(that.element, that.suggestionsContainer);
+            }
+        },
+
+        show: function () {
+            var that = this;
+            $(that.suggestionsContainer).show();
+            that.visible = true;
+
+            if ($.isFunction(that.options.onShow)) {
+              that.options.onShow.call(that.element, that.suggestionsContainer);
+            }
         },
 
         suggest: function () {
@@ -465,8 +481,7 @@
             }
 
             if ($(that.element).is(':focus')) {
-              that.visible = true;
-              container.show();
+              that.show();
             }
         },
 
