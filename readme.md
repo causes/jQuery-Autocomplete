@@ -18,6 +18,7 @@ The standard jquery.autocomplete.js file is around 2.7KB when minified via Closu
         * `lookupFilter`: `function (suggestion, query, queryLowerCase) {}` filter function for local lookups. By default it does partial string match (case insensitive).
         * `onSelect`: `function (suggestion) {}` Callback function invoked when user selects suggestion 
           from the list. `this` inside callback refers to input HtmlElement.
+        * `isSelectable`: `function (suggestion) {}` A function that determines whether a given suggestion is selectable; can be used to implement section headers. Returns `true` by default.
         * `minChars`: Minimum number of characters required to trigger autosuggest. Default: `1`.
         * `maxHeight`: Maximum height of the suggestions container in pixels. Default: `300`.
         * `deferRequestBy`: Number of miliseconds to defer ajax request. Default: `0`.
