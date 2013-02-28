@@ -38,6 +38,7 @@ The standard jquery.autocomplete.js file is around 2.7KB when minified via Closu
         * `paramName`: Default `query`. The name of the request parameter that contains the query.
         * `transformResult`: `function(response, originalQuery) {}` called after the result of the query is ready. Converts the result into response.suggestions format.
         * `autoSelectFirst`: if set to `true`, first item will be selected when showing suggestions. Default value `false`.
+        * `autoShow`: if set to `true`, the suggestions will be shown when the input field gains focus. Default value `false`.
         * `appendTo`: container where suggestions will be appended. Default value `body`. Can be jQuery object, selector or html element. Make sure to set `position: absolute` or `position: relative` for that element.
         * `dataType`: type of data returned from server. Either 'text' (default) or 'jsonp', which will cause the autocomplete to use jsonp. You may return a json object in your callback when using jsonp.
 

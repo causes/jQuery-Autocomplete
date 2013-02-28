@@ -71,6 +71,7 @@
             that = this,
             defaults = {
                 autoSelectFirst: false,
+                autoShow: false,
                 appendTo: 'body',
                 serviceUrl: null,
                 lookup: null,
@@ -198,11 +199,22 @@
 
             that.el.on('keyup', function (e) { that.onKeyUp(e); });
             that.el.on('blur', function () { that.onBlur(); });
-            that.el.on('focus', function () { that.fixPosition(); });
+            that.el.on('focus', function () { that.onFocus(); });
         },
 
         onBlur: function () {
             this.enableKillerFn();
+        },
+
+        onFocus : function() {
+          var that = this;
+          that.fixPosition();
+
+          if (!that.visible && that.suggestions.length > 0 && that.options.autoShow) {
+            that.disableKillerFn();
+            that.stopKillSuggestions();
+            that.show();
+          }
         },
 
         setOptions: function (suppliedOptions) {
