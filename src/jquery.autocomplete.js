@@ -456,13 +456,17 @@
                 html += '<div class="' + className + '" data-index="' + i + '">' + formatResult(suggestion, value) + '</div>';
             });
 
-            container.html(html).show();
-            that.visible = true;
+            container.html(html);
 
             // Select first value by default:
             if (that.options.autoSelectFirst) {
                 that.selectedIndex = 0;
                 container.children().first().addClass(classSelected);
+            }
+
+            if ($(that.element).is(':focus')) {
+              that.visible = true;
+              container.show();
             }
         },
 
