@@ -497,7 +497,7 @@
             }
 
             // Display suggestions only if returned query matches current value:
-            if (result.query === that.getQuery(that.currentValue)) {
+            if (result[options.paramName] === that.getQuery(that.currentValue)) {
                 that.suggestions = result.suggestions;
                 that.suggest();
             }
