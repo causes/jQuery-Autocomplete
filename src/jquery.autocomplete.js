@@ -89,6 +89,7 @@
                 onSearchComplete: noop,
                 containerClass: 'autocomplete-suggestions',
                 tabDisabled: false,
+                selectKeys: [keys.TAB, keys.RETURN],
                 dataType: 'text',
                 isSelectable: function (suggestion) {
                     return true;
@@ -279,7 +280,9 @@
         },
 
         onKeyPress: function (e) {
-            var that = this;
+            var that = this,
+                stopPropagation = true,
+                keyCode = e.keyCode;
 
             // If suggestions are hidden and user presses arrow down, display suggestions:
             if (!that.disabled && !that.visible && e.keyCode === keys.DOWN && that.currentValue) {
@@ -291,35 +294,31 @@
                 return;
             }
 
-            switch (e.keyCode) {
-                case keys.ESC:
-                    that.el.val(that.currentValue);
-                    that.hide();
-                    break;
-                case keys.TAB:
-                case keys.RETURN:
-                    if (that.selectedIndex === -1) {
-                        that.hide();
-                        return;
-                    }
-                    that.select(that.selectedIndex, e.keyCode === keys.RETURN);
-                    if (e.keyCode === keys.TAB && this.options.tabDisabled === false) {
-                        return;
-                    }
-                    break;
-                case keys.UP:
-                    that.moveUp();
-                    break;
-                case keys.DOWN:
-                    that.moveDown();
-                    break;
-                default:
-                    return;
+            if (keyCode === keys.TAB && that.options.tabDisabled === false) {
+                stopPropagation = false;
             }
 
-            // Cancel event if function did not return:
-            e.stopImmediatePropagation();
-            e.preventDefault();
+            if (that.options.selectKeys.indexOf(keyCode) !== -1) {
+                if (that.selectedIndex === -1) {
+                    that.hide();
+                    return;
+                }
+                that.select(that.selectedIndex, keyCode === keys.RETURN);
+            } else if (keyCode === keys.ESC) {
+                that.el.val(that.currentValue);
+                that.hide();
+            } else if (keyCode === keys.UP) {
+                that.moveUp();
+            } else if (keyCode === keys.DOWN) {
+                that.moveDown();
+            } else {
+                stopPropagation = false;
+            }
+
+            if (stopPropagation) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
         },
 
         onKeyUp: function (e) {
