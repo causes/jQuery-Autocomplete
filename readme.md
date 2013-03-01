@@ -18,6 +18,7 @@ The standard jquery.autocomplete.js file is around 2.7KB when minified via Closu
         * `lookupFilter`: `function (suggestion, query, queryLowerCase) {}` filter function for local lookups. By default it does partial string match (case insensitive).
         * `onSelect`: `function (suggestion) {}` Callback function invoked when user selects suggestion 
           from the list. `this` inside callback refers to input HtmlElement.
+        * `isSelectable`: `function (suggestion) {}` A function that determines whether a given suggestion is selectable; can be used to implement section headers. Returns `true` by default.
         * `minChars`: Minimum number of characters required to trigger autosuggest. Default: `1`.
         * `maxHeight`: Maximum height of the suggestions container in pixels. Default: `300`.
         * `deferRequestBy`: Number of miliseconds to defer ajax request. Default: `0`.
@@ -34,6 +35,7 @@ The standard jquery.autocomplete.js file is around 2.7KB when minified via Closu
         * `onHide`: `function (container) {}` called when the suggestions container is hidden. `this` is bound to the input element.
         * `onSearchStart`: `function (query) {}` called before ajax request. `this` is bound to input element.
         * `onSearchComplete`: `function (query) {}` called after ajax response is processed. `this` is bound to input element.
+        * `selectKeys`: Default `[TAB, ENTER]`. A list of keycodes which, when pressed invoke selection.
         * `tabDisabled`: Default `false`. Set to true to leave the cursor in the input field after the user tabs to select a suggestion.
         * `paramName`: Default `query`. The name of the request parameter that contains the query.
         * `transformResult`: `function(response, originalQuery) {}` called after the result of the query is ready. Converts the result into response.suggestions format.

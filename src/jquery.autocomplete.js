@@ -92,7 +92,11 @@
                 onSearchComplete: noop,
                 containerClass: 'autocomplete-suggestions',
                 tabDisabled: false,
+                selectKeys: [keys.TAB, keys.RETURN],
                 dataType: 'text',
+                isSelectable: function (suggestion) {
+                    return true;
+                },
                 lookupFilter: function (suggestion, originalQuery, queryLowerCase) {
                     return suggestion.value.toLowerCase().indexOf(queryLowerCase) !== -1;
                 },
@@ -179,8 +183,7 @@
 
             // Deselect active element when mouse leaves suggestions container:
             container.on('mouseout', function () {
-                that.selectedIndex = -1;
-                container.children('.' + selected).removeClass(selected);
+                that.activate(-1);
             });
 
             // Listen for click event on suggestions list:
@@ -291,7 +294,9 @@
         },
 
         onKeyPress: function (e) {
-            var that = this;
+            var that = this,
+                stopPropagation = true,
+                keyCode = e.keyCode;
 
             // If suggestions are hidden and user presses arrow down, display suggestions:
             if (!that.disabled && !that.visible && e.keyCode === keys.DOWN && that.currentValue) {
@@ -303,35 +308,31 @@
                 return;
             }
 
-            switch (e.keyCode) {
-                case keys.ESC:
-                    that.el.val(that.currentValue);
-                    that.hide();
-                    break;
-                case keys.TAB:
-                case keys.RETURN:
-                    if (that.selectedIndex === -1) {
-                        that.hide();
-                        return;
-                    }
-                    that.select(that.selectedIndex, e.keyCode === keys.RETURN);
-                    if (e.keyCode === keys.TAB && this.options.tabDisabled === false) {
-                        return;
-                    }
-                    break;
-                case keys.UP:
-                    that.moveUp();
-                    break;
-                case keys.DOWN:
-                    that.moveDown();
-                    break;
-                default:
-                    return;
+            if (keyCode === keys.TAB && that.options.tabDisabled === false) {
+                stopPropagation = false;
             }
 
-            // Cancel event if function did not return:
-            e.stopImmediatePropagation();
-            e.preventDefault();
+            if (that.options.selectKeys.indexOf(keyCode) !== -1) {
+                if (that.selectedIndex === -1) {
+                    that.hide();
+                    return;
+                }
+                that.select(that.selectedIndex, keyCode === keys.RETURN);
+            } else if (keyCode === keys.ESC) {
+                that.el.val(that.currentValue);
+                that.hide();
+            } else if (keyCode === keys.UP) {
+                that.moveUp();
+            } else if (keyCode === keys.DOWN) {
+                that.moveDown();
+            } else {
+                stopPropagation = false;
+            }
+
+            if (stopPropagation) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+            }
         },
 
         onKeyUp: function (e) {
@@ -532,22 +533,25 @@
 
         activate: function (index) {
             var that = this,
-                activeItem,
                 selected = that.classes.selected,
                 container = $(that.suggestionsContainer),
-                children = container.children();
+                children = container.children(),
+                activeItem = null,
+                suggestion = that.suggestions[index];
 
             container.children('.' + selected).removeClass(selected);
 
-            that.selectedIndex = index;
+            if (suggestion && that.options.isSelectable(suggestion)) {
+                that.selectedIndex = index;
 
-            if (that.selectedIndex !== -1 && children.length > that.selectedIndex) {
                 activeItem = children.get(that.selectedIndex);
                 $(activeItem).addClass(selected);
-                return activeItem;
-            }
 
-            return null;
+                return activeItem;
+            } else {
+                that.selectedIndex = -1;
+                return null;
+            }
         },
 
         select: function (i, shouldIgnoreNextValueChange) {
@@ -569,24 +573,25 @@
                 return;
             }
 
-            if (that.selectedIndex === 0) {
-                $(that.suggestionsContainer).children().first().removeClass(that.classes.selected);
-                that.selectedIndex = -1;
-                that.el.val(that.currentValue);
-                return;
+            for (var newIndex = that.selectedIndex - 1; newIndex >= 0; newIndex -= 1) {
+                if (that.options.isSelectable(that.suggestions[newIndex])) {
+                    break;
+                }
             }
 
-            that.adjustScroll(that.selectedIndex - 1);
+            that.adjustScroll(newIndex);
         },
 
         moveDown: function () {
             var that = this;
 
-            if (that.selectedIndex === (that.suggestions.length - 1)) {
-                return;
+            for (var newIndex = that.selectedIndex + 1; newIndex < that.suggestions.length; newIndex += 1) {
+                if (that.options.isSelectable(that.suggestions[newIndex])) {
+                    break;
+                }
             }
 
-            that.adjustScroll(that.selectedIndex + 1);
+            that.adjustScroll(newIndex);
         },
 
         adjustScroll: function (index) {
