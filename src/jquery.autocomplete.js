@@ -540,7 +540,7 @@
             var that = this,
                 selectedValue = that.suggestions[i];
 
-            if (selectedValue) {
+            if (selectedValue && that.options.isSelectable(selectedValue)) {
                 that.ignoreValueChange = shouldIgnoreNextValueChange;
                 that.hide();
                 that.onSelect(i);
