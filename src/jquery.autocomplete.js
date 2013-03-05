@@ -527,7 +527,6 @@
                 selectedValue = that.suggestions[i];
 
             if (selectedValue) {
-                that.el.val(selectedValue);
                 that.ignoreValueChange = shouldIgnoreNextValueChange;
                 that.hide();
                 that.onSelect(i);
