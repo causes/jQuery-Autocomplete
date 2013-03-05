@@ -115,7 +115,6 @@
         that.intervalId = 0;
         that.cachedResponse = [];
         that.onChangeInterval = null;
-        that.onChange = null;
         that.ignoreValueChange = false;
         that.isLocal = false;
         that.suggestionsContainer = null;
