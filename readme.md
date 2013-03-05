@@ -40,6 +40,7 @@ The standard jquery.autocomplete.js file is around 2.7KB when minified via Closu
         * `autoSelectFirst`: if set to `true`, first item will be selected when showing suggestions. Default value `false`.
         * `appendTo`: container where suggestions will be appended. Default value `body`. Can be jQuery object, selector or html element. Make sure to set `position: absolute` or `position: relative` for that element.
         * `dataType`: type of data returned from server. Either 'text' (default) or 'jsonp', which will cause the autocomplete to use jsonp. You may return a json object in your callback when using jsonp.
+        * `onActivate`: `function (suggestion, value) {}` called when a user highlights a suggestion. By default, sets the value of the input field (`this`) to `value`.
 
 ##Usage
 
