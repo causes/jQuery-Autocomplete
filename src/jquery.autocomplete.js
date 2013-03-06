@@ -105,6 +105,9 @@
                     var result = typeof response === 'string' ? $.parseJSON(response) : response;
                     result.query = originalQuery;
                     return result;
+                },
+                onActivate: function(suggestion, delimitedValue) {
+                    $(this).val(delimitedValue);
                 }
             };
 
@@ -118,7 +121,6 @@
         that.intervalId = 0;
         that.cachedResponse = [];
         that.onChangeInterval = null;
-        that.onChange = null;
         that.ignoreValueChange = false;
         that.isLocal = false;
         that.suggestionsContainer = null;
@@ -362,6 +364,13 @@
             }
         },
 
+        onActivate: function(suggestion) {
+            if ($.isFunction(this.options.onActivate)) {
+                this.options.onActivate.call(this.element, suggestion,
+                                             this.getValue(suggestion.value));
+            }
+        },
+
         onValueChange: function () {
             var that = this,
                 q;
@@ -489,8 +498,7 @@
 
             // Select first value by default:
             if (that.options.autoSelectFirst) {
-                that.selectedIndex = 0;
-                container.children().first().addClass(classSelected);
+                that.activate(that.nextSelectableIndex(1, -1), true);
             }
 
             if ($(that.element).is(':focus')) {
@@ -531,7 +539,7 @@
             }
         },
 
-        activate: function (index) {
+        activate: function (index, shouldTrigger) {
             var that = this,
                 selected = that.classes.selected,
                 container = $(that.suggestionsContainer),
@@ -547,9 +555,14 @@
                 activeItem = children.get(that.selectedIndex);
                 $(activeItem).addClass(selected);
 
+                if (shouldTrigger !== false) {
+                    that.onActivate(suggestion);
+                }
+
                 return activeItem;
             } else {
                 that.selectedIndex = -1;
+                that.el.val(that.currentValue);
                 return null;
             }
         },
@@ -558,43 +571,45 @@
             var that = this,
                 selectedValue = that.suggestions[i];
 
-            if (selectedValue) {
-                that.el.val(selectedValue);
+            if (selectedValue && that.options.isSelectable(selectedValue)) {
                 that.ignoreValueChange = shouldIgnoreNextValueChange;
                 that.hide();
                 that.onSelect(i);
             }
         },
 
-        moveUp: function () {
-            var that = this;
+        nextSelectableIndex: function(direction, start) {
+            var that = this,
+                max = that.suggestions.length;
 
-            if (that.selectedIndex === -1) {
-                return;
+            direction = direction < 0 ? -1 : 1;
+            if (typeof start === 'undefined') {
+                start = that.selectedIndex;
             }
 
-            for (var newIndex = that.selectedIndex - 1; newIndex >= 0; newIndex -= 1) {
+            for (var newIndex = start + direction;
+                 newIndex >= 0 && newIndex < max; newIndex += direction) {
                 if (that.options.isSelectable(that.suggestions[newIndex])) {
                     break;
                 }
             }
 
-            that.adjustScroll(newIndex);
+            if (newIndex < max) {
+                return newIndex;
+            }
+
+            return -1;
+        },
+
+        moveUp: function () {
+            this.activateAndScroll(this.nextSelectableIndex(-1));
         },
 
         moveDown: function () {
-            var that = this;
-
-            for (var newIndex = that.selectedIndex + 1; newIndex < that.suggestions.length; newIndex += 1) {
-                if (that.options.isSelectable(that.suggestions[newIndex])) {
-                    break;
-                }
-            }
-
-            that.adjustScroll(newIndex);
+            this.activateAndScroll(this.nextSelectableIndex(1));
         },
 
-        adjustScroll: function (index) {
+        activateAndScroll: function (index) {
             var that = this,
                 activeItem = that.activate(index),
                 offsetTop,
@@ -615,8 +630,6 @@
             } else if (offsetTop > lowerBound) {
                 $(that.suggestionsContainer).scrollTop(offsetTop - that.options.maxHeight + heightDelta);
             }
-
-            that.el.val(that.getValue(that.suggestions[index].value));
         },
 
         onSelect: function (index) {
@@ -624,7 +637,7 @@
                 onSelectCallback = that.options.onSelect,
                 suggestion = that.suggestions[index];
 
-            that.el.val(that.getValue(suggestion.value));
+            that.onActivate(suggestion);
 
             if ($.isFunction(onSelectCallback)) {
                 onSelectCallback.call(that.element, suggestion);
