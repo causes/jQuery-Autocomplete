@@ -321,7 +321,7 @@
                 }
                 that.select(that.selectedIndex, keyCode === keys.RETURN);
             } else if (keyCode === keys.ESC) {
-                that.el.val(that.currentValue);
+                that.resetValue();
                 that.hide();
             } else if (keyCode === keys.UP) {
                 that.moveUp();
@@ -564,8 +564,16 @@
                 return activeItem;
             } else {
                 that.selectedIndex = -1;
-                that.el.val(that.currentValue);
+                that.resetValue();
                 return null;
+            }
+        },
+
+        resetValue: function() {
+            var that = this;
+            // This check prevents the cursor from jumping to the end
+            if (that.el.val() != that.currentValue) {
+                that.el.val(that.currentValue);
             }
         },
 
