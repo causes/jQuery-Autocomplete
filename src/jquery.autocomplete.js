@@ -338,7 +338,8 @@
         },
 
         onKeyUp: function (e) {
-            var that = this;
+            var that = this,
+                newVal;
 
             if (that.disabled) {
                 return;
@@ -350,11 +351,13 @@
                     return;
             }
 
-            clearInterval(that.onChangeInterval);
+            newVal = that.el.val();
 
-            if (that.currentValue !== that.el.val()) {
+            if (that.currentValue !== newVal) {
+                that.currentValue = newVal;
                 if (that.options.deferRequestBy > 0) {
                     // Defer lookup in case when value changes very quickly:
+                    clearInterval(that.onChangeInterval);
                     that.onChangeInterval = setInterval(function () {
                         that.onValueChange();
                     }, that.options.deferRequestBy);
@@ -376,7 +379,6 @@
                 q;
 
             clearInterval(that.onChangeInterval);
-            that.currentValue = that.element.value;
 
             q = that.getQuery(that.currentValue);
             that.selectedIndex = -1;
@@ -498,7 +500,7 @@
 
             // Select first value by default:
             if (that.options.autoSelectFirst) {
-                that.activate(that.nextSelectableIndex(1, -1), true);
+                that.activate(that.nextSelectableIndex(1, -1), false);
             }
 
             if ($(that.element).is(':focus')) {
