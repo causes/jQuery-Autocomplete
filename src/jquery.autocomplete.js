@@ -473,7 +473,7 @@
 
             // Select first value by default:
             if (that.options.autoSelectFirst) {
-                that.activate(that.nextSelectableIndex(1, -1), true);
+                that.activate(that.nextSelectableIndex(1, -1), false);
             }
         },
 
