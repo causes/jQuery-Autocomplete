@@ -97,6 +97,9 @@
                 isSelectable: function (suggestion) {
                     return true;
                 },
+                compareBadQuery: function(query, badQuery) {
+                    return query.indexOf(badQuery) === 0;
+                },
                 lookupFilter: function (suggestion, originalQuery, queryLowerCase) {
                     return suggestion.value.toLowerCase().indexOf(queryLowerCase) !== -1;
                 },
@@ -448,11 +451,10 @@
                 i = badQueries.length;
 
             while (i--) {
-                if (q.indexOf(badQueries[i]) === 0) {
+                if (this.options.compareBadQuery(q, badQueries[i])) {
                     return true;
                 }
             }
-
             return false;
         },
 
